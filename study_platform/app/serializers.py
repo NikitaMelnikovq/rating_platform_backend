@@ -2,9 +2,15 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from .models import FormLink, Subject
+from .models import FormLink, Subject, Institute, Lesson, StudentFeedback
 
 User = get_user_model()
+
+class InstituteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Institute
+        fields = ["id", "name", "rating"]
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -62,3 +68,32 @@ class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
         fields = ["id","name", "teacher_id"]
+
+
+class LessonSerializer(serializers.ModelSerializer):
+    unique_link = serializers.SerializerMethodField()
+    is_link_active = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Lesson
+        fields = [
+            'id', 'teacher', 'institute', 'subject', 'topic', 'location',
+            'start_time', 'end_time', 'unique_code', 'unique_link',
+            'is_active', 'activation_duration', 'is_link_active',
+        ]
+        read_only_fields = ['unique_code', 'unique_link', 'is_link_active']
+
+    def get_unique_link(self, obj):
+        request = self.context.get('request')
+        if request:
+            return request.build_absolute_uri(obj.get_unique_link())
+        return obj.get_unique_link()
+
+    def get_is_link_active(self, obj):
+        return obj.is_link_active()
+    
+class StudentFeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentFeedback
+        fields = ['id', 'lesson', 'student_name', 'rating', 'comment', 'praises', 'created_at']
+        read_only_fields = ['created_at']

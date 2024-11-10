@@ -16,8 +16,16 @@ from .views import (
     ToggleLinkView,
     SubjectDeleteView, 
     SubjectListCreateView,
-    TeacherSubjectListView
+    TeacherSubjectListView,
+    CurrentUserView,
+    InstituteListView,
+    LessonCreateView,
+    LessonDetailView,
+    LessonByCodeView,
+    StudentFeedbackCreateView,
+    TeacherLessonListView
 )
+from .views import generate_qr_code
 
 urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -34,6 +42,14 @@ urlpatterns = [
     path('validate-link/<uuid:token>/', ValidateLinkView.as_view(), name='validate-link'),
     path('toggle-link/<uuid:token>/', ToggleLinkView.as_view(), name='toggle-link'),
     path('api/teacher-subjects/', TeacherSubjectListView.as_view(), name='teacher-subjects'),
+    path('api/current-user/', CurrentUserView.as_view(), name='current-user'),
+    path('api/institutes/', InstituteListView.as_view(), name='institute-list'),
+    path('api/lessons/', LessonCreateView.as_view(), name='lesson-create'),
+    path('api/lessons/<int:id>/', LessonDetailView.as_view(), name='lesson-detail'),
+    path('api/lessons/code/<uuid:unique_code>/', LessonByCodeView.as_view(), name='lesson-by-code'),
+    path('api/lessons/code/<uuid:unique_code>/feedback/', StudentFeedbackCreateView.as_view(), name='student-feedback'),
+    path('api/lessons/code/<uuid:unique_code>/qr/', generate_qr_code, name='generate-qr-code'),
+    path('api/lessons/subjects/', TeacherLessonListView.as_view(), name='teacher-lessons-list'),
 ]
 
 
