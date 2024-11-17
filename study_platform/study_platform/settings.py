@@ -32,10 +32,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    "app",
     'django_filters',
     'corsheaders',
     'rest_framework_simplejwt',
+    "app.apps.AppConfig",
+    "accounts.apps.AccountsConfig",
+    "subjects.apps.SubjectsConfig",
+    "institute.apps.InstituteConfig",
+    "lessons.apps.LessonsConfig",
 ]
 
 MIDDLEWARE = [
@@ -70,7 +74,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'study_platform.wsgi.application'
 
 
-# Database
+# Database4
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
@@ -121,24 +125,16 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = True # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect
 CORS_ALLOW_CREDENTIALS = True
+
 CORS_ALLOWED_ORIGINS = [    
-    "http://localhost:5175",
-    "http://127.0.0.1:5175",    
-    "http://192.168.1.122:5175",
-    "http://94.140.147.198:5175",
-    "http://localhost:5173",
     "http://127.0.0.1:5173",    
     "http://192.168.1.122:5173",
     "http://94.140.147.198:5173",
-    "http://localhost:5174",
-    "http://127.0.0.1:5174",    
-    "http://192.168.1.122:5174",
-    "http://94.140.147.198:5174",
+    "http://localhost:5173",
 ]
 
-AUTH_USER_MODEL = 'app.User'
+AUTH_USER_MODEL = 'accounts.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -148,10 +144,9 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Время действия access токена
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Время действия refresh токена
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60), 
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
     'AUTH_HEADER_TYPES': ('Bearer',),
-    # Другие настройки...
 }
