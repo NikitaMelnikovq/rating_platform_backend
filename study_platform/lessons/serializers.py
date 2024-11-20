@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils import timezone
 
 from .models import (
     Lesson,
@@ -16,19 +17,44 @@ class LessonSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'teacher', 'institute', 'subject', 'topic', 'location',
             'start_time', 'end_time', 'unique_code', 'unique_link',
-            'is_active', 'activation_duration', 'is_link_active',
+            'is_active', 'activation_duration', 'is_link_active', 'qr_code_base64'
         ]
         read_only_fields = ['unique_code', 'unique_link', 'is_link_active']
 
     def get_unique_link(self, obj):
-        request = self.context.get('request')
-        if request:
-            return request.build_absolute_uri(obj.get_unique_link())
-        return obj.get_unique_link()
-
+        frontend_base_url = "http://localhost:5173" 
+        return f"{frontend_base_url}/form/{obj.unique_code}/"
+    
     def get_is_link_active(self, obj):
         return obj.is_link_active()
     
+    
+    def validate(self, data):
+        start_time = data.get('start_time')
+        end_time = data.get('end_time')
+        topic = data.get('topic')
+
+        # Проверка времени начала и окончания
+        if end_time <= start_time:
+            raise serializers.ValidationError("Время окончания должно быть больше времени начала.")
+
+        # Проверка года
+        if start_time.year > timezone.now().year:
+            raise serializers.ValidationError("Год не может быть больше текущего.")
+
+        # Проверка длины темы
+        if len(topic) > 250:
+            raise serializers.ValidationError("Максимальная длина темы — 250 символов.")
+
+        return data
+        
+    def create(self, validated_data):
+        start_time = validated_data['start_time']
+        end_time = validated_data['end_time']
+        duration = end_time - start_time
+        validated_data['activation_duration'] = duration
+        lesson = super().create(validated_data)
+        return lesson
 
 class FormLinkSerializer(serializers.ModelSerializer):
     class Meta:

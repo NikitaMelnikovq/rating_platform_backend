@@ -12,12 +12,10 @@ class SubjectListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated, IsTeacherUser]
 
     def get_queryset(self):
-        # Возвращает предметы, связанные с текущим учителем
-        return Subject.objects.filter(teacher_id=self.request.user)
+        return Subject.objects.filter(teacher=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(teacher_id=self.request.user)
-
+        serializer.save(teacher=self.request.user)
 
 class SubjectDeleteView(generics.DestroyAPIView):
     serializer_class = SubjectSerializer

@@ -20,6 +20,7 @@ class Lesson(models.Model):
     is_active = models.BooleanField(default=True)
     activation_duration = models.DurationField(default=timedelta(minutes=10))
     created_at = models.DateTimeField(default=timezone.now, editable=False)
+    qr_code_base64 = models.TextField(null=True, blank=True)
 
     def get_unique_link(self):
         return f'/lesson/{self.unique_code}/'
@@ -27,8 +28,7 @@ class Lesson(models.Model):
     def is_link_active(self):
         if not self.is_active:
             return False
-        expiration_time = self.created_at + self.activation_duration
-        return timezone.now() <= expiration_time
+        return timezone.now() <= self.end_time
 
     def __str__(self):
         return f'Lesson: {self.topic} by {self.teacher}'

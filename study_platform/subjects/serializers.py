@@ -9,9 +9,10 @@ from .models import Subject
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
-        fields = ["id","name", "teacher_id"]
+        fields = ["id", "name", "teacher"]
+        read_only_fields = ["teacher"]
 
-
+        
 class TeacherSubjectListView(generics.ListAPIView):
     serializer_class = SubjectSerializer
     permission_classes = [IsAuthenticated, IsTeacherUser]
