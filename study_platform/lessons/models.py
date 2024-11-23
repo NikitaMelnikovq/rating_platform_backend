@@ -21,6 +21,8 @@ class Lesson(models.Model):
     activation_duration = models.DurationField(default=timedelta(minutes=10))
     created_at = models.DateTimeField(default=timezone.now, editable=False)
     qr_code_base64 = models.TextField(null=True, blank=True)
+    average_rating = models.FloatField(default=0.0)
+    feedback_count = models.PositiveIntegerField(default=0)
 
     def get_unique_link(self):
         return f'/lesson/{self.unique_code}/'

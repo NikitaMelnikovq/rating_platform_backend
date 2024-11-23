@@ -34,6 +34,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'corsheaders',
+    'django_celery_results',
+    'django_celery_beat',
     'rest_framework_simplejwt',
     "app.apps.AppConfig",
     "accounts.apps.AccountsConfig",
@@ -83,8 +85,8 @@ DATABASES = {
         'NAME': os.environ.get("DB_NAME"),       
         'USER': os.environ.get("DB_USER"),        
         'PASSWORD': os.environ.get("DB_PASSWORD"), 
-        'HOST': os.environ.get("DB_HOST"),          
-        'PORT': os.environ.get("DB_PORT"),                 
+        'HOST': os.environ.get("DB_HOST"), 
+        'PORT': os.environ.get("DB_PORT", "5432"),     
     }
 }
 
@@ -150,3 +152,11 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': False,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672/'
+CELERY_RESULT_BACKEND = 'django-db'  
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Yekaterinburg' 

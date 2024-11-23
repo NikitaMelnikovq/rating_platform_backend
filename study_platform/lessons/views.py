@@ -14,7 +14,7 @@ import qrcode
 
 from .serializers import LessonSerializer, StudentFeedbackSerializer
 from .models import Lesson
-# Create your views here.
+from .tasks import process_feedback
 
 class LessonCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -22,28 +22,20 @@ class LessonCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         lesson = serializer.save(teacher=self.request.user)
-        # После создания урока генерируем QR-код
-        # Получаем URL для обратной связи
         feedback_url = self.request.build_absolute_uri(
             reverse('lessons:student-feedback', kwargs={'unique_code': lesson.unique_code})
         )
 
-        # Генерируем QR-код
         img = qrcode.make(feedback_url)
-        # Сохраняем QR-код в память
         buffer = io.BytesIO()
         img.save(buffer, format='PNG')
-        # Кодируем изображение в base64
         qr_code_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-        # Сохраняем QR-код в экземпляр урока (если нужно)
         lesson.qr_code_base64 = qr_code_base64
         lesson.save()
-        # Сохраняем QR-код для использования в ответе
         self.qr_code_base64 = qr_code_base64
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
-        # Добавляем QR-код в ответ
         response.data['qr_code'] = self.qr_code_base64
         return response
     
@@ -86,6 +78,7 @@ class LessonByCodeView(generics.RetrieveAPIView):
         serializer = self.get_serializer(lesson)
         return Response(serializer.data)
 
+
 class TeacherLessonListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = LessonSerializer
@@ -96,25 +89,27 @@ class TeacherLessonListView(generics.ListAPIView):
     def get_queryset(self):
         return Lesson.objects.filter(teacher=self.request.user)
     
-# lessons/views.py
+
+
 class StudentFeedbackCreateView(generics.CreateAPIView):
     serializer_class = StudentFeedbackSerializer
 
-    def create(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         lesson_code = kwargs.get('unique_code')
         try:
             lesson = Lesson.objects.get(unique_code=lesson_code)
             if not lesson.is_link_active():
                 return Response({'error': 'Link is not active'}, status=status.HTTP_400_BAD_REQUEST)
-            # Associate the feedback with the lesson
-            request.data['lesson'] = lesson.id
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
+            feedback_data = request.data.copy()
+            feedback_data['lesson'] = lesson.id
+
+            process_feedback.delay(feedback_data)
+
+            return Response({'message': 'Feedback received and will be processed shortly.'}, status=status.HTTP_202_ACCEPTED)
+
         except Lesson.DoesNotExist:
             return Response({'error': 'Invalid lesson code'}, status=status.HTTP_404_NOT_FOUND)
-
 
 class IncreaseTimeView(APIView):
     permission_classes = [IsAuthenticated]
