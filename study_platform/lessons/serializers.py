@@ -17,7 +17,7 @@ class LessonSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'teacher', 'institute', 'subject', 'topic', 'location',
             'start_time', 'end_time', 'unique_code', 'unique_link',
-            'is_active', 'activation_duration', 'is_link_active', 'qr_code_base64'
+            'is_active', 'activation_duration', 'is_link_active', 'qr_code_base64', "rating"
         ]
         read_only_fields = ['unique_code', 'unique_link', 'is_link_active']
 

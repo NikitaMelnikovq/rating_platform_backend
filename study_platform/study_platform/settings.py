@@ -160,3 +160,9 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Yekaterinburg' 
+CELERY_BEAT_SCHEDULE = {
+    'recalculate_all_ratings': {
+        'task': 'lessons.tasks.recalculate_all_ratings',
+        'schedule': 30.0, 
+    },
+}

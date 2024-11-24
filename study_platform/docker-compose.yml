@@ -7,8 +7,8 @@ services:
     container_name: django_app
     command: >
       sh -c "
-      until pg_isready -h db -p 5432; do echo waiting for db; sleep 2; done;
-      python manage.py migrate &&
+      until pg_isready -h db -p 5432; do echo waiting for db; sleep 2; done; python manage.py makemigrations &&
+      python manage.py migrate && 
       gunicorn --bind 0.0.0.0:8000 study_platform.wsgi:application"
     volumes:
       - .:/app

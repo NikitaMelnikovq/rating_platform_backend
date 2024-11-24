@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from django.db import models
 from django.utils import timezone
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from accounts.models import User
 from institute.models import Institute
@@ -23,6 +24,12 @@ class Lesson(models.Model):
     qr_code_base64 = models.TextField(null=True, blank=True)
     average_rating = models.FloatField(default=0.0)
     feedback_count = models.PositiveIntegerField(default=0)
+    rating = models.FloatField(
+        null=True,
+        verbose_name='Рейтинг предмета',
+        default=0,
+        validators=[MinValueValidator(0.0), MaxValueValidator(5.0)]
+    )
 
     def get_unique_link(self):
         return f'/lesson/{self.unique_code}/'
