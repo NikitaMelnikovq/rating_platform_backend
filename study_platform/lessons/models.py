@@ -19,12 +19,10 @@ class Lesson(models.Model):
     end_time = models.DateTimeField()
     unique_code = models.UUIDField(default=uuid.uuid4, unique=True)
     is_active = models.BooleanField(default=True)
-    activation_duration = models.DurationField(default=timedelta(minutes=10))
     created_at = models.DateTimeField(default=timezone.now, editable=False)
     qr_code_base64 = models.TextField(null=True, blank=True)
-    average_rating = models.FloatField(default=0.0)
     feedback_count = models.PositiveIntegerField(default=0)
-    rating = models.FloatField(
+    average_rating = models.FloatField(
         null=True,
         verbose_name='Рейтинг предмета',
         default=0,
@@ -37,7 +35,7 @@ class Lesson(models.Model):
     def is_link_active(self):
         if not self.is_active:
             return False
-        return timezone.now() <= self.end_time
+        return self.start_time <= timezone.now() <= self.end_time
 
     def __str__(self):
         return f'Lesson: {self.topic} by {self.teacher}'

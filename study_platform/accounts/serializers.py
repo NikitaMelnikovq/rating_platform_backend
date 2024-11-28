@@ -5,15 +5,33 @@ from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+
+    rating = serializers.FloatField(default=0.0, required=False)
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'role', 'first_name', 'surname', 'last_name', 'institute', "rating"]
+        fields = ['id', 'username', 'role', 'first_name', 'surname', 'last_name', 'institute', "rating"]
 
+
+    def create(self, validated_data):
+        full_name = validated_data["name"]
+
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            password=validated_data['password'],
+            institute=validated_data["institute"],
+            role=validated_data["role"],
+            
+            rating=0,
+        )
+        return user
 
 class UserUpdateSerializer(serializers.ModelSerializer):
+    rating = serializers.FloatField(default=0.0, required=False)
+
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'surname']
+        fields = ['username', 'first_name', 'last_name', 'surname', 'rating']
 
         extra_kwargs = {
             'first_name': {'required': False, 'allow_blank': True},
@@ -38,14 +56,6 @@ class ChangePasswordSerializer(serializers.Serializer):
     
 
 class UserListSerializer(serializers.ModelSerializer):
-    rating = serializers.SerializerMethodField()
-    role = serializers.CharField(source='get_role_display')
-
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name', 'surname', 'role', 'rating']
-
-    def get_rating(self, obj):
-        # Предположим, что у пользователей есть поле rating или метод для его вычисления
-        # Если это не так, замените реализацию на вашу
-        return obj.get_rating() if hasattr(obj, 'get_rating') else None

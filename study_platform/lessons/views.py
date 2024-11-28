@@ -39,6 +39,10 @@ class LessonCreateView(generics.CreateAPIView):
         response.data['qr_code'] = self.qr_code_base64
         return response
     
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})  # Передаем request в контекст
+        return context
 
 class LessonDeleteView(APIView):
     permission_classes = [IsAuthenticated]
@@ -58,6 +62,11 @@ class LessonDetailView(generics.RetrieveUpdateAPIView):
     queryset = Lesson.objects.all()
     lookup_field = 'unique_code'
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})  # Передаем request в контекст
+        return context
+
     def get_queryset(self):
         return Lesson.objects.filter(teacher=self.request.user)
 
@@ -65,11 +74,32 @@ class LessonDetailView(generics.RetrieveUpdateAPIView):
         # Handle QR code generation or activation changes
         return self.partial_update(request, *args, **kwargs)
 
+class LessonStatView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = LessonSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})  # Передаем request в контекст
+        return context
+
+    def get_object(self):
+        unique_code = self.kwargs.get("unique_code")
+
+        return get_object_or_404(Lesson, unique_code=unique_code)
+
+
+
 
 class LessonByCodeView(generics.RetrieveAPIView):
     serializer_class = LessonSerializer
     lookup_field = 'unique_code'
     queryset = Lesson.objects.all()
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})  # Передаем request в контекст
+        return context
 
     def get(self, request, *args, **kwargs):
         lesson = self.get_object()
@@ -85,6 +115,11 @@ class TeacherLessonListView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['start_time', 'end_time']
     search_fields = ['topic']
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})  # Передаем request в контекст
+        return context
 
     def get_queryset(self):
         return Lesson.objects.filter(teacher=self.request.user)
@@ -116,11 +151,8 @@ class IncreaseTimeView(APIView):
 
     def patch(self, request, unique_code):
         try:
-            # Find the lesson by unique_code
             lesson = Lesson.objects.get(unique_code=unique_code, teacher=request.user)
 
-            # Increase the activation duration by 10 minutes
-            lesson.activation_duration += timedelta(minutes=10)
             lesson.end_time += timedelta(minutes=10)
             lesson.save()
 

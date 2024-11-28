@@ -8,6 +8,7 @@ from .views import (
     StudentFeedbackCreateView,
     LessonDeleteView,
     IncreaseTimeView,
+    LessonStatView,
     generate_qr_code,
 )
 
@@ -22,5 +23,6 @@ urlpatterns = [
     path('code/<uuid:unique_code>/feedback/', StudentFeedbackCreateView.as_view(), name='student-feedback'),
     path('code/<uuid:unique_code>/qr/', generate_qr_code, name='generate-qr-code'),
     path('<uuid:unique_code>/increase-time/', IncreaseTimeView.as_view(), name='increase-time'),
+    path('<uuid:unique_code>/lesson-stat/', LessonStatView.as_view(), name='increase-time'),
     
 ]

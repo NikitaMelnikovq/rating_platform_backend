@@ -13,8 +13,9 @@ class User(AbstractUser):
     surname = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255, blank=True, null=True)
     institute = models.ForeignKey(Institute, on_delete=models.CASCADE)
+    visible_reviews = models.BooleanField(default=True, verbose_name="Отображать отзывы")
+    email = models.CharField(null=True)
     rating = models.FloatField(
-        null=True,
         verbose_name='Рейтинг преподавателя',
         default=0,
         validators=[MinValueValidator(0.0), MaxValueValidator(5.0)]
