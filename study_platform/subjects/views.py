@@ -17,15 +17,20 @@ class SubjectListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(teacher=self.request.user)
 
+
 class SubjectDeleteView(generics.DestroyAPIView):
     serializer_class = SubjectSerializer
     permission_classes = [IsAuthenticated, IsTeacherUser]
     queryset = Subject.objects.all()
 
     def get_object(self):
-        subject = get_object_or_404(Subject, pk=self.kwargs['pk'], teacher_id=self.request.user)
+        subject = get_object_or_404(
+            Subject,
+            pk=self.kwargs['pk'],
+            teacher_id=self.request.user)
         return subject
-    
+
+
 class TeacherSubjectListView(generics.ListAPIView):
     serializer_class = SubjectSerializer
     permission_classes = [IsAuthenticated, IsTeacherUser]

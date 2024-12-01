@@ -8,7 +8,10 @@ from .views import (
     UpdateProfileView,
     ChangePasswordView,
     UserListView,
-    CurrentUserView
+    CurrentUserView,
+    UserCreateView,
+    UserDeleteView,
+    UserEditView
 )
 
 urlpatterns = [
@@ -21,4 +24,7 @@ urlpatterns = [
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('users/', UserListView.as_view(), name='user-list'),
     path('current-user/', CurrentUserView.as_view(), name='current-user'),
+    path("create-user/", UserCreateView.as_view(), name="create-user"),
+    path("delete-user/<int:id>/", UserDeleteView.as_view(), name="delete-user"),
+    path("edit-user/<int:id>/", UserEditView.as_view(), name="edit-user"),
 ]

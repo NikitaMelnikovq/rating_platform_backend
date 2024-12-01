@@ -21,7 +21,9 @@ def process_feedback(feedback_data):
 @shared_task
 def update_lesson_rating(lesson_id):
     lesson = Lesson.objects.get(id=lesson_id)
-    feedbacks = StudentFeedback.objects.filter(lesson=lesson).exclude(Q(rating__isnull=True) | Q(rating=0))
+    feedbacks = StudentFeedback.objects.filter(lesson=lesson).exclude(
+        Q(rating__isnull=True) | Q(rating=0)
+    )
 
     if feedbacks.exists(): 
         lesson.average_rating = feedbacks.aggregate(Avg('rating'))['rating__avg'] or 0
@@ -40,10 +42,11 @@ def update_lesson_rating(lesson_id):
 @shared_task
 def update_subject_rating(subject_id):
     subject = Subject.objects.get(id=subject_id)
-    lessons = Lesson.objects.filter(subject=subject).exclude(Q(average_rating__isnull=True) | Q(average_rating=0))
-
-    # Исключаем уроки с NULL или 0 средним рейтингом
-    subject_avg_rating = lessons.aggregate(Avg('average_rating'))['average_rating__avg'] or 0
+    lessons = Lesson.objects.filter(subject=subject).exclude(
+        Q(average_rating__isnull=True) | Q(average_rating=0)
+    )
+    subject_avg_rating = lessons.aggregate(
+        Avg('average_rating'))['average_rating__avg'] or 0
     subject.rating = subject_avg_rating
 
     subject.save()
@@ -53,10 +56,9 @@ def update_subject_rating(subject_id):
 def update_teacher_rating(teacher_id):
     teacher = User.objects.get(id=teacher_id, role='teacher')
     subjects = Subject.objects.filter(teacher=teacher).exclude(Q(rating__isnull=True) | Q(rating=0))
-
-    # Исключаем предметы с NULL или 0 рейтингом
     teacher_avg_rating = subjects.aggregate(Avg('rating'))['rating__avg'] or 0
     teacher.rating = teacher_avg_rating
+
     teacher.save()
 
 
@@ -64,19 +66,19 @@ def update_teacher_rating(teacher_id):
 def update_institute_rating(institute_id):
     institute = Institute.objects.get(id=institute_id)
     teachers = User.objects.filter(institute=institute, role='teacher')
-
-    # Исключаем преподавателей с рейтингом NULL или 0
     teachers_with_valid_ratings = teachers.exclude(
         Q(rating__isnull=True) | Q(rating=0)
     )
-
-    # Рассчитываем средний рейтинг института
-    institute_avg_rating = teachers_with_valid_ratings.aggregate(Avg('rating'))['rating__avg'] or 0
+    institute_avg_rating = teachers_with_valid_ratings.aggregate(
+        Avg('rating'))['rating__avg'] or 0
     institute.rating = institute_avg_rating
+
     institute.save()
+
 
 @shared_task
 def recalculate_all_ratings():
     lessons = Lesson.objects.all()
+
     for lesson in lessons:
         update_lesson_rating.delay(lesson.id)

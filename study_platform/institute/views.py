@@ -13,3 +13,4 @@ class InstituteListView(APIView):
         institutes = Institute.objects.all()
         serializer = InstituteSerializer(institutes, many=True)
         return Response(serializer.data)
+    

@@ -1,8 +1,8 @@
 from django.contrib.auth import get_user_model
 from rest_framework import (
+    filters,
     generics,
     status,
-    filters,
 )
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -10,15 +10,16 @@ from rest_framework.response import Response
 
 from app.permissions import IsAdminUser, IsTeacherUser
 from .serializers import (
+    ChangePasswordSerializer,
     UserSerializer,
     UserUpdateSerializer,
-    ChangePasswordSerializer,
     UserListSerializer,
+    UserEditSerializer,
 )
 
 User = get_user_model()
 
-# Create your views here.
+
 class AdminOnlyView(APIView):
     permission_classes = [IsAdminUser]
 
@@ -43,7 +44,6 @@ class UpdateProfileView(generics.UpdateAPIView):
         return self.request.userUser
 
 
-
 class CurrentUserView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -51,6 +51,7 @@ class CurrentUserView(APIView):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
     
+
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -88,5 +89,43 @@ class UpdateProfileView(generics.UpdateAPIView):
     def get_object(self):
         return self.request.user
 
+
 class UserCreateView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = UserSerializer
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class UserDeleteView(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    lookup_field = 'id'
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user_id = instance.id
+    
+        related_objects = RelatedModel.objects.filter(user=instance)
+        related_objects.delete()
+
+        self.perform_destroy(instance)
+        return Response({"message": f"User with id {user_id} has been deleted."}, status=status.HTTP_200_OK)
+
+
+class UserEditView(generics.RetrieveUpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = UserEditSerializer
+    queryset = User.objects.all()
+    lookup_field = 'id'
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.get('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)

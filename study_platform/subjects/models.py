@@ -7,7 +7,7 @@ from accounts.models import User
 class Subject(models.Model):
     name = models.CharField(max_length=255)
     teacher = models.ForeignKey(
-        User, 
+        User,
         on_delete=models.CASCADE,
         null=True,
         blank=True
@@ -21,5 +21,3 @@ class Subject(models.Model):
 
     def __str__(self):
         return self.name
-    
-    
