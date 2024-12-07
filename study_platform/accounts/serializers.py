@@ -19,7 +19,8 @@ class UserSerializer(serializers.ModelSerializer):
             'last_name',
             'institute',
             "rating",
-            "password"
+            "password",
+            "feedback_count",
         ]
         extra_kwargs = {
             'password': {'write_only': True}

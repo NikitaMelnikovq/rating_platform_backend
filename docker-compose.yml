@@ -3,7 +3,8 @@ version: '3.8'
 services:
   django:
     build:
-      context: .
+      context: ./study_platform
+      dockerfile: Dockerfile
     container_name: django_app
     command: >
       sh -c "
@@ -11,11 +12,11 @@ services:
       python manage.py migrate && 
       gunicorn --bind 0.0.0.0:8000 study_platform.wsgi:application"
     volumes:
-      - .:/app
+      - ./study_platform:/app
     ports:
       - "8000:8000"
     env_file:
-      - .env
+      - ./study_platform/.env
     depends_on:
       db:
         condition: service_healthy
@@ -40,6 +41,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    env_file:
+      - ./study_platform/.env
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -59,11 +62,14 @@ services:
 
   celery:
     build:
-      context: .
+      context: ./study_platform
+      dockerfile: Dockerfile
     container_name: celery_worker
     command: celery -A study_platform worker --loglevel=info
     volumes:
-      - .:/app
+      - ./study_platform:/app
+    env_file:
+      - ./study_platform/.env
     depends_on:
       db:
         condition: service_healthy
@@ -74,17 +80,38 @@ services:
 
   celery_beat:
     build:
-      context: .
+      context: ./study_platform
+      dockerfile: Dockerfile
     container_name: celery_beat
     command: celery -A study_platform beat --loglevel=info
     volumes:
-      - .:/app
+      - ./study_platform:/app
+    env_file:
+      - ./study_platform/.env
     depends_on:
       db:
         condition: service_healthy
       rabbitmq:
         condition: service_started
       redis:
+        condition: service_started
+
+  frontend:
+    build:
+      context: ./Student-voice-Front-end
+      dockerfile: Dockerfile
+    container_name: frontend
+    working_dir: /app
+    volumes:
+      - ./Student-voice-Front-end:/app
+      - /app/node_modules
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      django:
         condition: service_started
 
 volumes:

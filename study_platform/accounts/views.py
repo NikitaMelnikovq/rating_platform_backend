@@ -16,6 +16,7 @@ from .serializers import (
     UserListSerializer,
     UserEditSerializer,
 )
+from .pagination import Pagination
 
 User = get_user_model()
 
@@ -80,7 +81,7 @@ class UserListView(generics.ListAPIView):
     permission_classes = [IsAdminUser]
     filter_backends = [filters.SearchFilter]
     search_fields = ['first_name', 'last_name', 'surname']
-
+    pagination_class = Pagination
 
 class UpdateProfileView(generics.UpdateAPIView):
     serializer_class = UserUpdateSerializer
@@ -129,3 +130,10 @@ class UserEditView(generics.RetrieveUpdateAPIView):
         self.perform_update(serializer)
 
         return Response(serializer.data)
+
+
+class UserDetailView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    lookup_field = 'id'

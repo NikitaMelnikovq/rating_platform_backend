@@ -11,7 +11,8 @@ from .views import (
     CurrentUserView,
     UserCreateView,
     UserDeleteView,
-    UserEditView
+    UserEditView,
+    UserDetailView
 )
 
 urlpatterns = [
@@ -27,4 +28,5 @@ urlpatterns = [
     path("create-user/", UserCreateView.as_view(), name="create-user"),
     path("delete-user/<int:id>/", UserDeleteView.as_view(), name="delete-user"),
     path("edit-user/<int:id>/", UserEditView.as_view(), name="edit-user"),
+    path('view-user/<int:id>/', UserDetailView.as_view(), name='view-user'),
 ]

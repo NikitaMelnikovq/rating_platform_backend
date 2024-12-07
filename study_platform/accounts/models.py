@@ -15,6 +15,7 @@ class User(AbstractUser):
     institute = models.ForeignKey(Institute, on_delete=models.CASCADE)
     visible_reviews = models.BooleanField(default=True, verbose_name="Отображать отзывы")
     email = models.CharField(null=True, blank=True)
+    feedback_count = models.PositiveIntegerField(default=0)
     rating = models.FloatField(
         verbose_name='Рейтинг преподавателя',
         default=0,
