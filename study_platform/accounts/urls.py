@@ -12,7 +12,10 @@ from .views import (
     UserCreateView,
     UserDeleteView,
     UserEditView,
-    UserDetailView
+    UserDetailView,
+    TeacherListView,
+    ToggleReviewsVisibilityView,
+    GetReviewsVisibilityView
 )
 
 urlpatterns = [
@@ -29,4 +32,7 @@ urlpatterns = [
     path("delete-user/<int:id>/", UserDeleteView.as_view(), name="delete-user"),
     path("edit-user/<int:id>/", UserEditView.as_view(), name="edit-user"),
     path('view-user/<int:id>/', UserDetailView.as_view(), name='view-user'),
+    path('<int:institute_id>/list', TeacherListView.as_view(), name='teachers-by-institute'),
+    path('teachers/toggle-reviews/', ToggleReviewsVisibilityView.as_view(), name='toggle-reviews'),
+    path('teachers/reviews-visibility/', GetReviewsVisibilityView.as_view(), name='get-reviews-visibility'),
 ]

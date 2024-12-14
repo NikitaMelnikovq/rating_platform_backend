@@ -83,6 +83,16 @@ class UserListView(generics.ListAPIView):
     search_fields = ['first_name', 'last_name', 'surname']
     pagination_class = Pagination
 
+
+class TeacherListView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, institute_id):
+        teachers = User.objects.filter(role='teacher', institute_id=institute_id)
+
+        serializer = UserSerializer(teachers, many=True)
+        return Response(serializer.data)
+
 class UpdateProfileView(generics.UpdateAPIView):
     serializer_class = UserUpdateSerializer
     permission_classes = [IsAuthenticated]
@@ -137,3 +147,32 @@ class UserDetailView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     lookup_field = 'id'
+
+
+class ToggleReviewsVisibilityView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def post(self, request):
+        visible = request.data.get('visible_reviews')
+        if visible is None:
+            return Response({"detail": "visible_reviews field is required."}, status=400)
+
+        if not isinstance(visible, bool):
+            return Response({"detail": "visible_reviews must be a boolean."}, status=400)
+
+        # Обновляем всех преподавателей
+        User.objects.filter(role='teacher').update(visible_reviews=visible)
+        return Response({"detail": "Visibility updated successfully."}, status=200)
+    
+
+class GetReviewsVisibilityView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get(self, request):
+        # Проверяем состояние у любого преподавателя (если нет преподавателей, можно вернуть default True/False)
+        teacher = User.objects.filter(role='teacher').first()
+        if teacher:
+            return Response({"visible_reviews": teacher.visible_reviews}, status=200)
+        else:
+            # Если нет ни одного преподавателя
+            return Response({"visible_reviews": True}, status=200)  # или False, по умолчанию

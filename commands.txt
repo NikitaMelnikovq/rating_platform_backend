@@ -1,0 +1,12 @@
+docker compose build --no-cache
+docker compose --env-file ./study_platform/.env up
+
+docker exec -it django_app python3 manage.py shell
+
+from accounts.models import User
+from institute.models import Institute
+
+new_institute = Institute.objects.create(id=1, name='Падик')
+new_institute.save()
+
+new_user = User.objects.create(username='admin', password='1234', first_name='Админ', last_name='Админович', surname='Админов', role='admin', institute=new_institute)

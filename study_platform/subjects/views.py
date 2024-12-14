@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, filters
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from .serializers import SubjectSerializer
 from .models import Subject
@@ -30,6 +31,16 @@ class SubjectDeleteView(generics.DestroyAPIView):
             teacher_id=self.request.user)
         return subject
 
+
+class SubjectByTeacherView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, teacher_id):
+        queryset = Subject.objects.filter(teacher_id=teacher_id)
+
+        serializer = SubjectSerializer(queryset, many=True)
+
+        return Response(serializer.data)
 
 class TeacherSubjectListView(generics.ListAPIView):
     serializer_class = SubjectSerializer

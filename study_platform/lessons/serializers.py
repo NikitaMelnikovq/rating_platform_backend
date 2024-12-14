@@ -6,6 +6,7 @@ from .models import (
     FormLink,
     StudentFeedback,
 )
+from institute.models import Institute
 from accounts.models import User
 
 
@@ -84,7 +85,27 @@ class FormLinkSerializer(serializers.ModelSerializer):
         fields = ['token', 'created_at', 'expires_at', 'is_active']
 
 
+class TeacherShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'surname']  # Можно добавить last_name, если нужно
+
+class InstituteShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Institute
+        fields = ['id', 'name']
+
+class LessonShortSerializer(serializers.ModelSerializer):
+    teacher = TeacherShortSerializer(read_only=True)
+    institute = InstituteShortSerializer(read_only=True)
+
+    class Meta:
+        model = Lesson
+        fields = ['id', 'topic', 'location', 'teacher', 'institute']
+
 class StudentFeedbackSerializer(serializers.ModelSerializer):
+    lesson = LessonShortSerializer(read_only=True)
+
     class Meta:
         model = StudentFeedback
         fields = [
