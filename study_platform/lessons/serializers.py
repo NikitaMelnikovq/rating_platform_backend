@@ -13,8 +13,8 @@ from accounts.models import User
 class LessonSerializer(serializers.ModelSerializer):
     unique_link = serializers.SerializerMethodField()
     is_link_active = serializers.SerializerMethodField()
-    student_feedback_count = serializers.SerializerMethodField()  #  Подсчет отзывов
-    student_feedback = serializers.SerializerMethodField()  #  Условное отображение отзывов
+    student_feedback_count = serializers.SerializerMethodField()
+    student_feedback = serializers.SerializerMethodField()
 
     class Meta:
         model = Lesson
@@ -28,13 +28,12 @@ class LessonSerializer(serializers.ModelSerializer):
 
     def get_unique_link(self, obj):
         frontend_base_url = 'http://localhost:5173'
-        return f"{frontend_base_url}/form/{obj.unique_code}/"
+        return f'{frontend_base_url}/form/{obj.unique_code}/'
 
     def get_is_link_active(self, obj):
         return obj.is_link_active()
 
     def get_student_feedback_count(self, obj):
-        # Подсчитываем количество отзывов для конкретного урока
         return StudentFeedback.objects.filter(lesson=obj).count()
 
     def get_student_feedback(self, obj):
@@ -42,9 +41,9 @@ class LessonSerializer(serializers.ModelSerializer):
         if not request:
             return []
 
-        user = request.user  #  Текущий пользователь
+        user = request.user
         if not isinstance(user, User) or not user.visible_reviews:
-            return []  #  Возвращаем пустой список, если отзывы не разрешены
+            return []
 
         feedbacks = StudentFeedback.objects.filter(lesson=obj)
         return [
@@ -88,12 +87,14 @@ class FormLinkSerializer(serializers.ModelSerializer):
 class TeacherShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'surname']  # Можно добавить last_name, если нужно
+        fields = ['id', 'first_name', 'surname']
+
 
 class InstituteShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = Institute
         fields = ['id', 'name']
+
 
 class LessonShortSerializer(serializers.ModelSerializer):
     teacher = TeacherShortSerializer(read_only=True)
@@ -102,6 +103,7 @@ class LessonShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
         fields = ['id', 'topic', 'location', 'teacher', 'institute']
+
 
 class StudentFeedbackSerializer(serializers.ModelSerializer):
     lesson = LessonShortSerializer(read_only=True)

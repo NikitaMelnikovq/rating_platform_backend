@@ -6,14 +6,9 @@ from subjects.models import Subject
 from lessons.models import Lesson
 from lessons.models import StudentFeedback
 
-# Register your models here.
 
 admin.site.register(User)
-
 admin.site.register(Institute)
-
 admin.site.register(Subject)
-
 admin.site.register(Lesson)
-
 admin.site.register(StudentFeedback)

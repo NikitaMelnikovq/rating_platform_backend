@@ -18,9 +18,9 @@ class UserSerializer(serializers.ModelSerializer):
             'surname',
             'last_name',
             'institute',
-            "rating",
-            "password",
-            "feedback_count",
+            'rating',
+            'password',
+            'feedback_count',
         ]
         extra_kwargs = {
             'password': {'write_only': True}
@@ -30,11 +30,11 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(
             username=validated_data['username'],
             password=validated_data['password'],
-            institute=validated_data["institute"],
-            first_name=validated_data["first_name"],
-            last_name=validated_data.get("last_name", ''),
-            surname=validated_data["surname"],
-            role=validated_data["role"],
+            institute=validated_data['institute'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data.get('last_name', ''),
+            surname=validated_data['surname'],
+            role=validated_data['role'],
             rating=0,
         )
 
@@ -54,8 +54,8 @@ class UserEditSerializer(serializers.ModelSerializer):
             'institute',
             'rating',
             'password',
-            "is_active",
-            "visible_reviews"
+            'is_active',
+            'visible_reviews',
         ]
         extra_kwargs = {
             'password': {'write_only': True, 'required': False},
@@ -96,7 +96,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         if User.objects.exclude(pk=user.pk).filter(username=value).exists():
             raise serializers.ValidationError(
-                "Пользователь с таким логином уже существует.")
+                'Пользователь с таким логином уже существует.')
         return value
 
 
@@ -112,4 +112,10 @@ class ChangePasswordSerializer(serializers.Serializer):
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'surname', 'role', 'rating']
+        fields = ['id', 
+                  'first_name',
+                  'last_name',
+                  'surname',
+                  'role',
+                  'rating',
+                ]

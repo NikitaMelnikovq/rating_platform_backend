@@ -9,6 +9,7 @@ from accounts.models import User
 from institute.models import Institute
 from subjects.models import Subject
 
+
 class Lesson(models.Model):
     teacher = models.ForeignKey(User, on_delete=models.CASCADE)
     institute = models.ForeignKey(Institute, on_delete=models.CASCADE)
@@ -39,7 +40,7 @@ class Lesson(models.Model):
 
     def __str__(self):
         return f'Lesson: {self.topic} by {self.teacher}'
-    
+
 
 class FormLink(models.Model):
     token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -49,14 +50,14 @@ class FormLink(models.Model):
 
     def is_valid(self):
         return self.is_active and timezone.now() < self.expires_at
-    
+
 
 class StudentFeedback(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     student_name = models.CharField(max_length=255)
     rating = models.PositiveSmallIntegerField()
     comment = models.TextField(blank=True)
-    praises = models.JSONField(default=list)  # To store selected praises
+    praises = models.JSONField(default=list)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

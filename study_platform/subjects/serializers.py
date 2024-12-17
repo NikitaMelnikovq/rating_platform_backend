@@ -9,8 +9,8 @@ from .models import Subject
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
-        fields = ["id", "name", "teacher", "rating"]
-        read_only_fields = ["teacher"]
+        fields = ['id', 'name', 'teacher', 'rating']
+        read_only_fields = ['teacher']
 
 
 class TeacherSubjectListView(generics.ListAPIView):

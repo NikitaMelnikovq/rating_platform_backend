@@ -14,7 +14,7 @@ from .views import (
     generate_qr_code,
 )
 
-app_name = 'lessons' 
+app_name = 'lessons'
 
 urlpatterns = [
     path('', LessonCreateView.as_view(), name='lesson-create'),
@@ -27,5 +27,5 @@ urlpatterns = [
     path('<uuid:unique_code>/increase-time/', IncreaseTimeView.as_view(), name='increase-time'),
     path('<uuid:unique_code>/lesson-stat/', LessonStatView.as_view(), name='increase-time'),
     path('teacher-lessons/<int:id>/', TeacherLessonListByIdView.as_view(), name='teacher-lessons-by-id'),   
-    path("teacher-report/<int:id>/", TeacherExcelReportView.as_view(), name="teacher-report"),
+    path('teacher-report/<int:id>/', TeacherExcelReportView.as_view(), name='teacher-report'),
 ]

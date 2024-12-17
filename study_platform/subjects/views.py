@@ -42,6 +42,7 @@ class SubjectByTeacherView(generics.ListAPIView):
 
         return Response(serializer.data)
 
+
 class TeacherSubjectListView(generics.ListAPIView):
     serializer_class = SubjectSerializer
     permission_classes = [IsAuthenticated, IsTeacherUser]

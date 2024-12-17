@@ -9,11 +9,12 @@ class User(AbstractUser):
         ('admin', 'Admin'),
         ('teacher', 'Teacher'),
     )
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="admin")
+    
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='admin')
     surname = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255, blank=True, null=True)
     institute = models.ForeignKey(Institute, on_delete=models.CASCADE)
-    visible_reviews = models.BooleanField(default=True, verbose_name="Отображать отзывы")
+    visible_reviews = models.BooleanField(default=True, verbose_name='Отображать отзывы')
     email = models.CharField(null=True, blank=True)
     feedback_count = models.PositiveIntegerField(default=0)
     rating = models.FloatField(
