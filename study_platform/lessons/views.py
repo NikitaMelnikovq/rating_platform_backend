@@ -196,6 +196,7 @@ class StudentFeedbackCreateView(generics.CreateAPIView):
         except Lesson.DoesNotExist:
             return Response({'error': 'Invalid lesson code'}, status=status.HTTP_404_NOT_FOUND)
 
+
 class IncreaseTimeView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -225,7 +226,6 @@ def generate_qr_code(request, unique_code):
     response = HttpResponse(content_type="image/png")
     img.save(response, "PNG")
     return response
-
 
 
 class TeacherExcelReportView(APIView):
@@ -299,7 +299,6 @@ class TeacherExcelReportView(APIView):
 
         ws2 = wb.create_sheet("Отзывы")
 
-        # Добавляем ещё одну колонку после "Результат" для praises
         ws2.append(["Студент", "Предмет", "Пара (Тема)", "Дата и время", "Комментарий", "Оценка", "Результат", "Praises"])
 
         teacher_lessons = Lesson.objects.filter(teacher=teacher)

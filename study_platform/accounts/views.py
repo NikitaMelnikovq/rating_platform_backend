@@ -62,11 +62,9 @@ class ChangePasswordView(APIView):
         if serializer.is_valid():
             user = request.user
 
-            # Проверяем старый пароль
             if not user.check_password(serializer.validated_data['old_password']):
                 return Response({"old_password": ["Неверный пароль."]}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Устанавливаем новый пароль
             user.set_password(serializer.validated_data['new_password'])
             user.save()
 
@@ -160,7 +158,6 @@ class ToggleReviewsVisibilityView(APIView):
         if not isinstance(visible, bool):
             return Response({"detail": "visible_reviews must be a boolean."}, status=400)
 
-        # Обновляем всех преподавателей
         User.objects.filter(role='teacher').update(visible_reviews=visible)
         return Response({"detail": "Visibility updated successfully."}, status=200)
     
@@ -169,10 +166,8 @@ class GetReviewsVisibilityView(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get(self, request):
-        # Проверяем состояние у любого преподавателя (если нет преподавателей, можно вернуть default True/False)
         teacher = User.objects.filter(role='teacher').first()
         if teacher:
             return Response({"visible_reviews": teacher.visible_reviews}, status=200)
         else:
-            # Если нет ни одного преподавателя
-            return Response({"visible_reviews": True}, status=200)  # или False, по умолчанию
+            return Response({"visible_reviews": True}, status=200)

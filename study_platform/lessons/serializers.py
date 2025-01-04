@@ -8,23 +8,46 @@ from .models import (
 )
 from institute.models import Institute
 from accounts.models import User
-
+from subjects.models import Subject
 
 class LessonSerializer(serializers.ModelSerializer):
     unique_link = serializers.SerializerMethodField()
     is_link_active = serializers.SerializerMethodField()
     student_feedback_count = serializers.SerializerMethodField()
     student_feedback = serializers.SerializerMethodField()
+    teacher_first_name = serializers.CharField(source='teacher.first_name', read_only=True)
+    teacher_last_name = serializers.CharField(source='teacher.surname', read_only=True)    
+    subject_name = serializers.CharField(source='subject.name', read_only=True)
 
     class Meta:
         model = Lesson
         fields = [
-            'id', 'teacher', 'institute', 'subject', 'topic', 'location',
-            'start_time', 'end_time', 'unique_code', 'unique_link',
-            'is_active', 'is_link_active', 'qr_code_base64', 'average_rating',
-            'student_feedback_count', 'student_feedback'
+            'id', 
+            'teacher_first_name', 
+            'teacher_last_name', 
+            'institute', 
+            'subject_name', 
+            'topic', 
+            'location',
+            'start_time', 
+            'end_time', 
+            'unique_code', 
+            'unique_link',
+            'is_active', 
+            'is_link_active', 
+            'qr_code_base64', 
+            'average_rating',
+            'student_feedback_count', 
+            'student_feedback'
         ]
-        read_only_fields = ['unique_code', 'unique_link', 'is_link_active']
+        read_only_fields = [
+            'unique_code', 
+            'unique_link', 
+            'is_link_active',
+            'teacher_first_name', 
+            'teacher_last_name', 
+            'subject_name'
+        ]
 
     def get_unique_link(self, obj):
         frontend_base_url = 'http://localhost:5173'
