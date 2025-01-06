@@ -18,11 +18,15 @@ class LessonSerializer(serializers.ModelSerializer):
     teacher_first_name = serializers.CharField(source='teacher.first_name', read_only=True)
     teacher_last_name = serializers.CharField(source='teacher.surname', read_only=True)    
     subject_name = serializers.CharField(source='subject.name', read_only=True)
-
+    subject = serializers.PrimaryKeyRelatedField(
+        queryset=Subject.objects.all(),
+        write_only=True
+    )
     class Meta:
         model = Lesson
         fields = [
-            'id', 
+            'id',
+            'subject', 
             'teacher_first_name', 
             'teacher_last_name', 
             'institute', 
